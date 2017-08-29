@@ -1,8 +1,9 @@
 import Terms
 
-eval :: Term a -> Env -> Val a
+eval :: Term a -> Env a -> Val a
 eval (Lit v) env = v
 eval (Var n) env = env n
+-- eval (Pair t1 t2) env = P (eval t1 env, eval t2 env)
 eval (Pair t1 t2) env = P (eval t1 env, eval t2 env)
 eval (Cons t1 t2) env =
     case (eval t1 env, eval t2 env) of

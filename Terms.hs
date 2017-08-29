@@ -1,13 +1,16 @@
+{-# LANGUAGE DataKinds, GADTs #-}
 module Terms where
 
-type Name typ = String
+type Name = String
 
-data Val a where
+data Val :: * -> * where
     N :: Int -> Val Int
     B :: Bool -> Val Bool
     P :: Val a -> Val b -> Val (a, b)
     L :: [Val a] -> Val [a]
     F :: (Val a -> Val b) -> Val (a -> b)
+
+data SomeVal where SomeVal :: Val a -> SomeVal
 
 {--
 data Val = N Int
@@ -33,9 +36,9 @@ data Type = TBool
           | TFun Type Type
           deriving Eq
 
-data Term a where
+data Term :: * -> * where
     Lit :: Val a -> Term a
-    Var :: Name a -> Term a
+    Var :: Name -> Term a
     Pair :: Term a -> Term b -> Term (a, b)
     Cons :: Term a -> Term [a] -> Term [a]
     Lam :: Name -> Type -> Term a -> Term a
@@ -58,11 +61,14 @@ data Term a = Lit (Val a)
 
 data FBiGUL = Clause Term Term Term
 
-type Env t = Name t -> Val t
+{--
+type Env t = Name -> Maybe Val t
+data Env where
+    EmptyEnv :: Env
+    Succ :: Name -> Val a -> Env
+    --}
 
-extend :: Name -> Val a -> Env a -> Env a
-extend x v env y = if x == y then v
-                             else env y
+lookupEnv :: Name -> Env -> Val
 
 type Cxt = Name -> Type
 extendCxt :: Name -> Type -> Cxt -> Cxt
