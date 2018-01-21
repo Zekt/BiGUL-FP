@@ -1,6 +1,6 @@
 import Terms
 
-eval :: Term a -> Env -> Val a
+eval :: Term -> Env -> Val
 eval (Lit v) env = v
 eval (Var n) env = env n
 eval (Pair t1 t2) env = P (eval t1 env, eval t2 env)
@@ -29,7 +29,7 @@ match v (Var n) env = Just (extend n v env)
 match (P (v1, v2)) (Pair t1 t2) env =
     case match v1 t1 env of
       Just env' -> match v2 t2 env'
-match (L (v:vs) typ) (Cons head tail) env =
+match (L (v:vs)) (Cons head tail) env =
     case match v head env of
-      Just env' -> match (L vs typ) tail env'
+      Just env' -> match (L vs) tail env'
 match _ _ _ = Nothing
